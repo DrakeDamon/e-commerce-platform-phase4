@@ -1,0 +1,22 @@
+#hybrid_property allows for secure password handling
+from sqlalchemy.ext.hybrid import hybrid_property
+#turn db objects into dicts/json
+from sqlalchemy_serializer import SerializerMixin
+import json
+
+#Grabs db from config
+from config import db
+
+class User(db.Model, SerializerMixin):
+  __tablename__ = 'users'
+
+  id = db.Column(db.Integer, primary_key=True)
+  #nullable=false ensure a username is entered
+  #unique=true ensure no 2 users are the same
+  username = db.Column(db.String(15), nullable=False, unique=True)
+  email = db.Column(db.String(50), nullable=False, unique=True)
+  _password_hash = db.Column(db.String(15), nullable=False)
+  address = db.Column(db.String(200))
+  created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+
