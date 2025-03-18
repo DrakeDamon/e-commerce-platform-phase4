@@ -30,16 +30,18 @@ class User(db.Model, SerializerMixin):
   serialize_rules = ('-_password_hash', '-products.seller', 'orders.buyer')
 
 
-
+#hybrid_property allows password_hash to act like normal property to work in both code and db
   @hybrid_property
   def password_hash(self):
     raise AttributeError('Password hashes may not be viewed.')
-  
+
+ #tells python to scramble password
   @password_hash.setter
   def password_hash(self, password):
     from werkzeug.security  import generate_password_hash
     self._password_hash = generate_password_hash(password)
 
+#checks if password matches stored hash
   def check_password(self, password):
     from werkzeug.security import check_password_hash
     return check_password_hash(self._password_hash, password)
