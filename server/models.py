@@ -45,5 +45,23 @@ class User(db.Model, SerializerMixin):
   def check_password(self, password):
     from werkzeug.security import check_password_hash
     return check_password_hash(self._password_hash, password)
+  
+
+class Product(db.Model, SerializerMixin):
+  #create product db table
+  __tablename__ = 'products'
+
+  id = db.Column(db.Integer, primary_key=True)
+  name = db.Column(db.String(100), nullable=False)
+  description = db.Column(db.Text)
+  price = db.Column(db.Float, nullable=False)
+  inventory_count = db.Column(db.Integer, default= 0)
+  image_url = db.Column(db.String(255))
+
+  #clothing-specific attributes
+  #store as JSON string
+  available_sizes = db.Column(db.String(255))
+  available_colors = db.Column(db.String(255))
+
 
 
