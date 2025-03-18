@@ -71,7 +71,10 @@ class Product(db.Model, SerializerMixin):
   seller = db.relationship('User', back_populates='products')
   product_categories = db.relationship('ProductCategory', back_populates='products', cascade='all, delete-orphan')
 
-  #
+  #Serialization rules
+  serialize_rules = ('-seller.products', '-product_categories.product')
+
+  
 
 
 
