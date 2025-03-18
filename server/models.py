@@ -74,7 +74,20 @@ class Product(db.Model, SerializerMixin):
   #Serialization rules
   serialize_rules = ('-seller.products', '-product_categories.product')
 
+  #helper methods for JSON attributes
+  #json.dumps takes list of sizes and turns it into a single string
+  def set_sizes(self, sizes_list):
+    self.available_sizes = json.dumps(sizes_list)
+
+  #converts stored string and converts it into a list via json.loads or gives []
+  def get_sizes(self):
+    return json.loads(self.available_sizes) if self.available_sizes else []
   
+  def set_colors(self, colors_list):
+    self.available_colors = json.dumps(colors_list)
+
+  def get_colors(self):
+    return json.loads(self.available_colors) if self.available_colors else []
 
 
 
