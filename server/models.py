@@ -19,4 +19,8 @@ class User(db.Model, SerializerMixin):
   address = db.Column(db.String(200))
   created_at = db.Column(db.DateTime, server_default=db.func.now())
 
+  #Relationships
+  products = db.relationship('Product', back_populates='seller', cascade='all, delete-orphan')
+  orders = db.relationship('Order', back_populates='buyer', cascade='all, delete-orphan')
+
 
