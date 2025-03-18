@@ -63,5 +63,9 @@ class Product(db.Model, SerializerMixin):
   available_sizes = db.Column(db.String(255))
   available_colors = db.Column(db.String(255))
 
+  #foreign keys
+  #connects to a specific user
+  user_id = db.Column(db.Integer, db.ForeignKey('users-id'), nullable=False)
+
 
 
