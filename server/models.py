@@ -25,4 +25,8 @@ class User(db.Model, SerializerMixin):
   products = db.relationship('Product', back_populates='seller', cascade='all, delete-orphan')
   orders = db.relationship('Order', back_populates='buyer', cascade='all, delete-orphan')
 
+  #Serialization/format rules
+  # "-" means dont use
+  serialize_rules = ('-_password_hash', '-products.seller', 'orders.buyer')
+
 
