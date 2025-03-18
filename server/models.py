@@ -67,5 +67,11 @@ class Product(db.Model, SerializerMixin):
   #connects to a specific user
   user_id = db.Column(db.Integer, db.ForeignKey('users-id'), nullable=False)
 
+  #Relationships
+  seller = db.relationship('User', back_populates='products')
+  product_categories = db.relationship('ProductCategory', back_populates='products', cascade='all, delete-orphan')
+
+  #
+
 
 
