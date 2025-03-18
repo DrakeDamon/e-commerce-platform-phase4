@@ -88,6 +88,15 @@ class Product(db.Model, SerializerMixin):
 
   def get_colors(self):
     return json.loads(self.available_colors) if self.available_colors else []
+  
+class Category(db.Model, SerializerMixin):
+  __tablename__ = 'categories'
+
+  id = db.Column(db.Integer, primary_key=True)
+  name = db.Column(db.String(50), nullable=False, unique=True)
+  description = db.Column(db.Text)
+
+  
 
 
 
