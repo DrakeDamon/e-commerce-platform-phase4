@@ -30,3 +30,18 @@ class User(db.Model, SerializerMixin):
   serialize_rules = ('-_password_hash', '-products.seller', 'orders.buyer')
 
 
+
+  @hybrid_property
+  def password_hash(self):
+    raise AttributeError('Password hashes may not be viewed.')
+  
+  @password_hash.setter
+  def password_hash(self, password):
+    from werkzeug.security  import generate_password_hash
+    self._password_hash = generate_password_hash(password)
+
+  def check_password(self, password):
+    from werkzeug.security import check_password_hash
+    return check_password_hash(self._password_hash, password)
+
+
