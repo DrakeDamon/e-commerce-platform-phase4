@@ -96,7 +96,15 @@ class Category(db.Model, SerializerMixin):
   name = db.Column(db.String(50), nullable=False, unique=True)
   description = db.Column(db.Text)
 
-  
+  #Relationships (one to many)
+  product_categories = db.relationship('ProductCategory', back_populates='category', cascade='all, delete-orphan')
+
+  #Serialization rules
+  #, makes it a tuple
+  serialize_rules = ('-product_categories.category',)
+
+
+
 
 
 
