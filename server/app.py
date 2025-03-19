@@ -356,5 +356,103 @@ class ProductCategoryById(Resource):
         db.session.commit()
         
         return '', 204
+    
+# Order Routes
+class Orders(Resource):
+    def get(self):
+        user_id = session.get('user_id')
+        if not user_id:
+            return {'error': 'You must be logged in to view orders'}, 401
+        
+        orders = [order.to_dict() for order in Order.query.filter_by(user_id=user_id)]
+        return orders, 200
+    
+    def post(self):
+        user_id = session.get('user_id')
+        if not user_id:
+            return {'error': 'You must be logged in to create an order'}, 401
+        
+        data = request.get_json()
+        
+        try:
+            new_order = Order(
+                user_id=user_id,
+                status='pending',
+                total_amount=data['total_amount'],
+                shipping_address=data.get('shipping_address', ''),
+            )
+            
+            # Set order items
+            if 'items' in data:
+                new_order.set_items(data['items'])
+            
+            db.session.add(new_order)
+            db.session.commit()
+            
+            return new_order.to_dict(), 201
+        
+        except Exception as e:
+            return {'error': str(e)}, 400
+
+class OrderById(Resource):
+    def get(self, id):
+        order = Order.query.filter_by(id=id).first()
+        
+        if not order:
+            return {'error': 'Order not found'}, 404
+        
+        user_id = session.get('user_id')
+        if not user_id or order.user_id != user_id:
+            return {'error': 'You do not have permission to view this order'}, 403
+            
+        return order.to_dict(), 200
+    
+    def patch(self, id):
+        order = Order.query.filter_by(id=id).first()
+        
+        if not order:
+            return {'error': 'Order not found'}, 404
+        
+        user_id = session.get('user_id')
+        if not user_id or order.user_id != user_id:
+            return {'error': 'You do not have permission to update this order'}, 403
+        
+        data = request.get_json()
+        
+        # Update simple fields
+        if 'status' in data:
+            order.status = data['status']
+            
+        if 'shipping_address' in data:
+            order.shipping_address = data['shipping_address']
+            
+        if 'total_amount' in data:
+            order.total_amount = data['total_amount']
+            
+        # Update items if provided
+        if 'items' in data:
+            order.set_items(data['items'])
+        
+        db.session.commit()
+        
+        return order.to_dict(), 200
+
+# Register resources
+api.add_resource(Users, '/users')
+api.add_resource(UserById, '/users/<int:id>')
+api.add_resource(Login, '/login')
+api.add_resource(Logout, '/logout')
+api.add_resource(CheckSession, '/me')
+api.add_resource(Products, '/products')
+api.add_resource(ProductById, '/products/<int:id>')
+api.add_resource(Categories, '/categories')
+api.add_resource(CategoryById, '/categories/<int:id>')
+api.add_resource(ProductCategories, '/product_categories')
+api.add_resource(ProductCategoryById, '/product_categories/<int:id>')
+api.add_resource(Orders, '/orders')
+api.add_resource(OrderById, '/orders/<int:id>')
+
+if __name__ == '__main__':
+    app.run(port=5555, debug=True)
 
       
