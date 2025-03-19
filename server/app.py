@@ -11,10 +11,14 @@ def index():
 
 # User Routes
 class Users(Resource):
+    #retrieve all users and return 200 (ok)
+    #converts db objects to dictionaries
     def get(self):
         users = [user.to_dict() for user in User.query.all()]
         return users, 200
     
+    #post request to create a new user
+    # 201 status code (created)
     def post(self):
         data = request.get_json()
         
@@ -22,6 +26,7 @@ class Users(Resource):
             new_user = User(
                 username=data['username'],
                 email=data['email'],
+                #provides empty string if address isnt provided
                 address=data.get('address', '')
             )
             new_user.password_hash = data['password']
@@ -45,7 +50,7 @@ class UserById(Resource):
             return {'error': 'User not found'}, 404
             
         return user.to_dict(), 200
-    
+    #partial updates to user
     def patch(self, id):
         user = User.query.filter_by(id=id).first()
         
@@ -358,6 +363,7 @@ class ProductCategoryById(Resource):
         return '', 204
     
 # Order Routes
+
 class Orders(Resource):
     def get(self):
         user_id = session.get('user_id')
@@ -366,7 +372,7 @@ class Orders(Resource):
         
         orders = [order.to_dict() for order in Order.query.filter_by(user_id=user_id)]
         return orders, 200
-    
+#creates new orders
     def post(self):
         user_id = session.get('user_id')
         if not user_id:

@@ -5,10 +5,11 @@ from models import db, User, Product, Category, ProductCategory, Order
 import json
 
 def seed_database():
+    #ensures we are working ith flask app context
     with app.app_context():
         print("Starting seed...")
         
-        # Clear existing data
+        # Clear existing data in reverse order to avoid foreign key constraint violations
         ProductCategory.query.delete()
         Product.query.delete()
         Category.query.delete()
@@ -38,8 +39,8 @@ def seed_database():
         # Create categories
         print("Creating categories...")
         all_category = Category(name="All", description="All clothing items")
-        tops_category = Category(name="Tops", description="Shirts, T-shirts, and blouses")
-        bottoms_category = Category(name="Bottoms", description="Pants, shorts, and skirts")
+        tops_category = Category(name="Tops", description="Shirts, T-shirts, and Jackets")
+        bottoms_category = Category(name="Bottoms", description="Pants, shorts, and Sweats")
 
         db.session.add_all([all_category, tops_category, bottoms_category])
         db.session.commit()
@@ -58,7 +59,7 @@ def seed_database():
         product1.set_colors(["White", "Black", "Navy", "Gray"])
 
         product2 = Product(
-            name="Slim Fit Jeans",
+            name="Athletic Cotton Sweats",
             description="Comfortable slim fit jeans made with stretch denim. Perfect for everyday wear.",
             price=49.99,
             inventory_count=35,
@@ -69,7 +70,7 @@ def seed_database():
         product2.set_colors(["Blue", "Black", "Gray"])
 
         product3 = Product(
-            name="Casual Button-Down Shirt",
+            name="Athletic workout shirt",
             description="Lightweight button-down shirt made from 100% cotton. Great for casual or semi-formal occasions.",
             price=39.99,
             inventory_count=25,
@@ -83,6 +84,7 @@ def seed_database():
         db.session.commit()
 
         # Create product-category associations
+        #many to many relationship between products and categories
         print("Creating product-category associations...")
         pc1 = ProductCategory(product_id=product1.id, category_id=all_category.id, featured=True)
         pc2 = ProductCategory(product_id=product1.id, category_id=tops_category.id, featured=True)
