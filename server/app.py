@@ -249,6 +249,65 @@ class ProductById(Resource):
         db.session.delete(product)
         db.session.commit()
         
-        return '', 204   
+        return '', 204  
+
+# Category Routes
+class Categories(Resource):
+    def get(self):
+        categories = [category.to_dict() for category in Category.query.all()]
+        return categories, 200
+    
+    def post(self):
+        data = request.get_json()
+        
+        try:
+            new_category = Category(
+                name=data['name'],
+                description=data.get('description', '')
+            )
+            
+            db.session.add(new_category)
+            db.session.commit()
+            
+            return new_category.to_dict(), 201
+        
+        except Exception as e:
+            return {'error': str(e)}, 400
+
+class CategoryById(Resource):
+    def get(self, id):
+        category = Category.query.filter_by(id=id).first()
+        
+        if not category:
+            return {'error': 'Category not found'}, 404
+            
+        return category.to_dict(), 200
+    
+    def patch(self, id):
+        category = Category.query.filter_by(id=id).first()
+        
+        if not category:
+            return {'error': 'Category not found'}, 404
+        
+        data = request.get_json()
+        
+        for attr in data:
+            if hasattr(category, attr):
+                setattr(category, attr, data[attr])
+        
+        db.session.commit()
+        
+        return category.to_dict(), 200
+    
+    def delete(self, id):
+        category = Category.query.filter_by(id=id).first()
+        
+        if not category:
+            return {'error': 'Category not found'}, 404
+            
+        db.session.delete(category)
+        db.session.commit()
+        
+        return '', 204 
 
       
