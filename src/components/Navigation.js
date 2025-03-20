@@ -1,14 +1,14 @@
 import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserContext } from '../context/UserContext'; // Correct path
-import { CartContext } from '../context/CartContext'; // Correct path
-import { FilterContext } from '../context/FilterContext'; // Correct path
-import '../styles/components/Navigation.css'; // Correct path
+import { UserContext } from '../context/UserContext';
+import { CartContext } from '../context/CartContext';
+import { FilterContext } from '../context/FilterContext';
+import '../styles/components/Navigation.css';
 
 const Navigation = ({ onLoginClick, onRegisterClick }) => {
   const { user, logout } = useContext(UserContext);
   const { itemCount } = useContext(CartContext);
-  const { categories, setSelectedCategory, setSelectedSubcategory } = useContext(FilterContext);
+  const { categories, setSelectedCategory, setSelectedSubcategory, setSearchTerm } = useContext(FilterContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -26,12 +26,23 @@ const Navigation = ({ onLoginClick, onRegisterClick }) => {
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
     setSelectedSubcategory(null);
+    setSearchTerm(''); // Clear search term when changing category
     setIsMenuOpen(false);
   };
 
   const handleSubcategoryClick = (subcategory) => {
     setSelectedSubcategory(subcategory);
+    setSearchTerm(''); // Clear search term when changing subcategory
     setIsMenuOpen(false);
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') {
+      const term = e.target.value.trim();
+      setSearchTerm(term);
+      e.target.value = '';
+      setIsMenuOpen(false);
+    }
   };
 
   return (
@@ -96,12 +107,7 @@ const Navigation = ({ onLoginClick, onRegisterClick }) => {
             <input
               type="text"
               placeholder="Search products..."
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  navigate(`/?search=${e.target.value}`);
-                  e.target.value = '';
-                }
-              }}
+              onKeyPress={handleSearch}
             />
             <button className="search-button">
               <span role="img" aria-label="search">🔍</span>
