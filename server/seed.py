@@ -38,11 +38,10 @@ def seed_database():
 
         # Create categories
         print("Creating categories...")
-        all_category = Category(name="All", description="All clothing items")
         tops_category = Category(name="Tops", description="Shirts, T-shirts, and Jackets")
         bottoms_category = Category(name="Bottoms", description="Pants, shorts, and Sweats")
 
-        db.session.add_all([all_category, tops_category, bottoms_category])
+        db.session.add_all([tops_category, bottoms_category])
         db.session.commit()
 
         # Create subcategories
@@ -100,14 +99,11 @@ def seed_database():
 
         # Create product-category associations
         print("Creating product-category associations...")
-        pc1 = ProductCategory(product_id=product1.id, category_id=all_category.id, featured=True)
-        pc2 = ProductCategory(product_id=product1.id, category_id=tops_category.id, featured=True)
-        pc3 = ProductCategory(product_id=product2.id, category_id=all_category.id, featured=False)
-        pc4 = ProductCategory(product_id=product2.id, category_id=bottoms_category.id, featured=True)
-        pc5 = ProductCategory(product_id=product3.id, category_id=all_category.id, featured=False)
-        pc6 = ProductCategory(product_id=product3.id, category_id=tops_category.id, featured=False)
+        pc1 = ProductCategory(product_id=product1.id, category_id=tops_category.id, featured=True)
+        pc2 = ProductCategory(product_id=product2.id, category_id=bottoms_category.id, featured=True)
+        pc3 = ProductCategory(product_id=product3.id, category_id=tops_category.id, featured=False)
 
-        db.session.add_all([pc1, pc2, pc3, pc4, pc5, pc6])
+        db.session.add_all([pc1, pc2, pc3])
         db.session.commit()
 
         # Create sample order

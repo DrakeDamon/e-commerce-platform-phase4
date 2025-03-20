@@ -37,6 +37,15 @@ class User(db.Model, SerializerMixin):
         from werkzeug.security import check_password_hash
         return check_password_hash(self._password_hash, password)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'address': self.address,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
 class Product(db.Model, SerializerMixin):
     __tablename__ = 'products'
 
@@ -72,6 +81,20 @@ class Product(db.Model, SerializerMixin):
     def get_colors(self):
         return json.loads(self.available_colors) if self.available_colors else []
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'price': self.price,
+            'inventory_count': self.inventory_count,
+            'image_url': self.image_url,
+            'available_sizes': self.get_sizes(),
+            'available_colors': self.get_colors(),
+            'user_id': self.user_id,
+            'subcategory_id': self.subcategory_id
+        }
+
 class Category(db.Model, SerializerMixin):
     __tablename__ = 'categories'
 
@@ -86,6 +109,14 @@ class Category(db.Model, SerializerMixin):
     # Serialization rules
     serialize_rules = ('-product_categories.category', '-subcategories.category')
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'subcategories': [subcategory.to_dict() for subcategory in self.subcategories]
+        }
+
 class Subcategory(db.Model, SerializerMixin):
     __tablename__ = 'subcategories'
 
@@ -99,6 +130,13 @@ class Subcategory(db.Model, SerializerMixin):
 
     # Serialization rules
     serialize_rules = ('-category.subcategories', '-products.subcategory')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'category_id': self.category_id
+        }
 
 class ProductCategory(db.Model, SerializerMixin):
     __tablename__ = 'product_categories'
@@ -116,6 +154,14 @@ class ProductCategory(db.Model, SerializerMixin):
     
     # Serialization rules
     serialize_rules = ('-product.product_categories', '-category.product_categories')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'product_id': self.product_id,
+            'category_id': self.category_id,
+            'featured': self.featured
+        }
 
 class Order(db.Model, SerializerMixin):
     __tablename__ = 'orders'
@@ -140,3 +186,14 @@ class Order(db.Model, SerializerMixin):
         
     def get_items(self):
         return json.loads(self.items_json) if self.items_json else []
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'status': self.status,
+            'total_amount': self.total_amount,
+            'shipping_address': self.shipping_address,
+            'items': self.get_items(),
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
