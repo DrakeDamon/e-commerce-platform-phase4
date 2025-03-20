@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
+import { CartContext } from '../context/CartContext';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
+  const { addToCart } = useContext(CartContext);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -26,9 +30,21 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
+  const handleAddToCart = () => {
+    if (!selectedSize || !selectedColor) {
+      alert('Please select a size and color');
+      return;
+    }
+    addToCart(product, 1, selectedSize, selectedColor);
+    alert('Product added to cart!');
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
   if (!product) return <div>Product not found</div>;
+
+  const sizes = product.available_sizes ? JSON.parse(product.available_sizes) : [];
+  const colors = product.available_colors ? JSON.parse(product.available_colors) : [];
 
   return (
     <div className="product-detail">
@@ -37,9 +53,25 @@ const ProductDetail = () => {
       <p>{product.description}</p>
       <p>Price: ${product.price}</p>
       <p>Inventory: {product.inventory_count}</p>
-      <p>Sizes: {product.available_sizes ? JSON.parse(product.available_sizes).join(', ') : 'N/A'}</p>
-      <p>Colors: {product.available_colors ? JSON.parse(product.available_colors).join(', ') : 'N/A'}</p>
-      <button>Add to Cart</button> {/* Placeholder for cart functionality */}
+      <div>
+        <label>Size:</label>
+        <select value={selectedSize} onChange={(e) => setSelectedSize(e.target.value)}>
+          <option value="">Select a size</option>
+          {sizes.map((size) => (
+            <option key={size} value={size}>{size}</option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label>Color:</label>
+        <select value={selectedColor} onChange={(e) => setSelectedColor(e.target.value)}>
+          <option value="">Select a color</option>
+          {colors.map((color) => (
+            <option key={color} value={color}>{color}</option>
+          ))}
+        </select>
+      </div>
+      <button onClick={handleAddToCart}>Add to Cart</button>
     </div>
   );
 };
