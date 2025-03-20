@@ -7,6 +7,7 @@ export const FilterProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(''); // Add searchTerm state
   const navigate = useNavigate();
 
   // Fetch categories and subcategories from the backend
@@ -26,21 +27,24 @@ export const FilterProvider = ({ children }) => {
     fetchCategories();
   }, []);
 
-  // Update the URL when the selected category or subcategory changes
+  // Update the URL when the selected category, subcategory, or search term changes
   useEffect(() => {
     let url = '/';
-    if (selectedCategory !== 'All' || selectedSubcategory) {
-      const params = new URLSearchParams();
-      if (selectedCategory !== 'All') {
-        params.set('category', selectedCategory);
-      }
-      if (selectedSubcategory) {
-        params.set('subcategory', selectedSubcategory);
-      }
+    const params = new URLSearchParams();
+    if (selectedCategory !== 'All') {
+      params.set('category', selectedCategory);
+    }
+    if (selectedSubcategory) {
+      params.set('subcategory', selectedSubcategory);
+    }
+    if (searchTerm) {
+      params.set('search', searchTerm);
+    }
+    if (params.toString()) {
       url = `/?${params.toString()}`;
     }
     navigate(url, { replace: true });
-  }, [selectedCategory, selectedSubcategory, navigate]);
+  }, [selectedCategory, selectedSubcategory, searchTerm, navigate]);
 
   return (
     <FilterContext.Provider
@@ -50,6 +54,8 @@ export const FilterProvider = ({ children }) => {
         setSelectedCategory,
         selectedSubcategory,
         setSelectedSubcategory,
+        searchTerm,
+        setSearchTerm, // Provide setSearchTerm to update the search term
       }}
     >
       {children}

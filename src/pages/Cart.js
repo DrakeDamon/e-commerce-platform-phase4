@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react'; // Add useState
 import { CartContext } from '../context/CartContext';
 
 const Cart = () => {
