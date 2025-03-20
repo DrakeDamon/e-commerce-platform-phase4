@@ -1,10 +1,36 @@
-import React, { useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { UserContext } from '../context/UserContext';
 
 const UserProfile = () => {
   const { user, updateProfile } = useContext(UserContext);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch('http://localhost:5555/orders', {
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch orders');
+        }
+        const data = await response.json();
+        setOrders(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchOrders();
+    }
+  }, [user]);
 
   const initialValues = {
     address: user?.address || '',
@@ -53,6 +79,27 @@ const UserProfile = () => {
           </Form>
         )}
       </Formik>
+
+      <h2>Order History</h2>
+      {loading && <div>Loading orders...</div>}
+      {error && <div>Error: {error}</div>}
+      {!loading && !error && orders.length === 0 && <div>No orders found.</div>}
+      {!loading && !error && orders.length > 0 && (
+        <ul>
+          {orders.map((order) => (
+            <li key={order.id}>
+              Order #{order.id} - Status: {order.status}, Total: ${order.total_amount}
+              <ul>
+                {order.items.map((item, index) => (
+                  <li key={index}>
+                    Product ID: {item.product_id}, Quantity: {item.quantity}, Price: ${item.price_at_purchase}, Size: {item.size}, Color: {item.color}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
