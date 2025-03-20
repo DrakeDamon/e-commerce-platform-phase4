@@ -1,0 +1,115 @@
+.home-page {
+  min-height: calc(100vh - 60px);
+}
+
+.hero-banner {
+  background-color: var(--primary-light);
+  background-image: linear-gradient(
+    to right,
+    var(--primary-light),
+    var(--secondary-color)
+  );
+  color: white;
+  padding: var(--spacing-xxl) 0;
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+.hero-content h1 {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+  color: white;
+}
+
+.hero-content p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.content-container {
+  display: flex;
+  gap: var(--spacing-xl);
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+.sidebar {
+  width: 250px;
+  flex-shrink: 0;
+}
+
+.products-container {
+  flex-grow: 1;
+}
+
+.search-results-header {
+  margin-bottom: var(--spacing-lg);
+}
+
+.search-results-header h2 {
+  font-size: 1.5rem;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: var(--spacing-xxl) 0;
+  color: var(--light-text);
+}
+
+.error-message {
+  padding: var(--spacing-lg);
+  color: var(--error-color);
+  background-color: rgba(222, 54, 24, 0.1);
+  border-radius: var(--border-radius-md);
+}
+
+.no-products-message {
+  padding: var(--spacing-xxl) 0;
+  text-align: center;
+  color: var(--light-text);
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+@media (max-width: 992px) {
+  .content-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    margin-bottom: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--spacing-md);
+  }
+}

@@ -8,105 +8,103 @@ import json
 from config import db
 
 class User(db.Model, SerializerMixin):
-  __tablename__ = 'users'
+    __tablename__ = 'users'
 
-  id = db.Column(db.Integer, primary_key=True)
-  #nullable=false ensure a username is entered
-  #unique=true ensure no 2 users are the same
-  username = db.Column(db.String(15), nullable=False, unique=True)
-  email = db.Column(db.String(50), nullable=False, unique=True)
-  _password_hash = db.Column(db.String(128), nullable=False)
-  address = db.Column(db.String(200))
-  created_at = db.Column(db.DateTime, server_default=db.func.now())
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(15), nullable=False, unique=True)
+    email = db.Column(db.String(50), nullable=False, unique=True)
+    _password_hash = db.Column(db.String(128), nullable=False)
+    address = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
 
-  #Relationships
-  #back_populates creates a relationship between Product and user
-  #cascade happens when a user is deleted
-  products = db.relationship('Product', back_populates='seller', cascade='all, delete-orphan')
-  orders = db.relationship('Order', back_populates='buyer', cascade='all, delete-orphan')
+    # Relationships
+    products = db.relationship('Product', back_populates='seller', cascade='all, delete-orphan')
+    orders = db.relationship('Order', back_populates='buyer', cascade='all, delete-orphan')
 
-  #Serialization/format rules
-  # "-" means dont use
-  serialize_rules = ('-_password_hash', '-products.seller', '-orders.buyer')
+    # Serialization rules
+    serialize_rules = ('-_password_hash', '-products.seller', '-orders.buyer')
 
+    @hybrid_property
+    def password_hash(self):
+        raise AttributeError('Password hashes may not be viewed.')
 
-#hybrid_property allows password_hash to act like normal property to work in both code and db
-  @hybrid_property
-  def password_hash(self):
-    raise AttributeError('Password hashes may not be viewed.')
+    @password_hash.setter
+    def password_hash(self, password):
+        from werkzeug.security import generate_password_hash
+        self._password_hash = generate_password_hash(password)
 
- #tells python to scramble password
-  @password_hash.setter
-  def password_hash(self, password):
-    from werkzeug.security  import generate_password_hash
-    self._password_hash = generate_password_hash(password)
-
-#checks if password matches stored hash
-  def check_password(self, password):
-    from werkzeug.security import check_password_hash
-    return check_password_hash(self._password_hash, password)
-  
+    def check_password(self, password):
+        from werkzeug.security import check_password_hash
+        return check_password_hash(self._password_hash, password)
 
 class Product(db.Model, SerializerMixin):
-  #create product db table
-  __tablename__ = 'products'
+    __tablename__ = 'products'
 
-  id = db.Column(db.Integer, primary_key=True)
-  name = db.Column(db.String(100), nullable=False)
-  description = db.Column(db.Text)
-  price = db.Column(db.Float, nullable=False)
-  inventory_count = db.Column(db.Integer, default= 0)
-  image_url = db.Column(db.String(255))
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    price = db.Column(db.Float, nullable=False)
+    inventory_count = db.Column(db.Integer, default=0)
+    image_url = db.Column(db.String(255))
+    available_sizes = db.Column(db.String(255))
+    available_colors = db.Column(db.String(255))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    subcategory_id = db.Column(db.Integer, db.ForeignKey('subcategories.id'))  # New field
 
-  #clothing-specific attributes
-  #store as JSON string
-  available_sizes = db.Column(db.String(255))
-  available_colors = db.Column(db.String(255))
+    # Relationships
+    seller = db.relationship('User', back_populates='products')
+    product_categories = db.relationship('ProductCategory', back_populates='product', cascade='all, delete-orphan')
+    subcategory = db.relationship('Subcategory', back_populates='products')
 
-  #foreign keys
-  #connects to a specific user
-  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  #Relationships
-  seller = db.relationship('User', back_populates='products')
-  product_categories = db.relationship('ProductCategory', back_populates='product', cascade='all, delete-orphan')
+    # Serialization rules
+    serialize_rules = ('-seller.products', '-product_categories.product', '-subcategory.products')
 
-  #Serialization rules
-  serialize_rules = ('-seller.products', '-product_categories.product')
+    # Helper methods for JSON attributes
+    def set_sizes(self, sizes_list):
+        self.available_sizes = json.dumps(sizes_list)
 
-  #helper methods for JSON attributes
-  #json.dumps takes list of sizes and turns it into a single string
-  def set_sizes(self, sizes_list):
-    self.available_sizes = json.dumps(sizes_list)
+    def get_sizes(self):
+        return json.loads(self.available_sizes) if self.available_sizes else []
 
-  #converts stored string and converts it into a list via json.loads or gives []
-  def get_sizes(self):
-    return json.loads(self.available_sizes) if self.available_sizes else []
-  
-  def set_colors(self, colors_list):
-    self.available_colors = json.dumps(colors_list)
+    def set_colors(self, colors_list):
+        self.available_colors = json.dumps(colors_list)
 
-  def get_colors(self):
-    return json.loads(self.available_colors) if self.available_colors else []
-  
+    def get_colors(self):
+        return json.loads(self.available_colors) if self.available_colors else []
+
 class Category(db.Model, SerializerMixin):
-  __tablename__ = 'categories'
+    __tablename__ = 'categories'
 
-  id = db.Column(db.Integer, primary_key=True)
-  name = db.Column(db.String(50), nullable=False, unique=True)
-  description = db.Column(db.Text)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False, unique=True)
+    description = db.Column(db.Text)
 
-  #Relationships (one to many)
-  product_categories = db.relationship('ProductCategory', back_populates='category', cascade='all, delete-orphan')
+    # Relationships (one to many)
+    product_categories = db.relationship('ProductCategory', back_populates='category', cascade='all, delete-orphan')
+    subcategories = db.relationship('Subcategory', back_populates='category', cascade='all, delete-orphan')
 
-  #Serialization rules
-  #, makes it a tuple
-  serialize_rules = ('-product_categories.category',)
+    # Serialization rules
+    serialize_rules = ('-product_categories.category', '-subcategories.category')
 
+class Subcategory(db.Model, SerializerMixin):
+    __tablename__ = 'subcategories'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
+
+    # Relationships
+    category = db.relationship('Category', back_populates='subcategories')
+    products = db.relationship('Product', back_populates='subcategory', cascade='all, delete-orphan')
+
+    # Serialization rules
+    serialize_rules = ('-category.subcategories', '-products.subcategory')
 
 class ProductCategory(db.Model, SerializerMixin):
     __tablename__ = 'product_categories'
     
     id = db.Column(db.Integer, primary_key=True)
-    featured = db.Column(db.Boolean, default=False)  # User-submittable attribute
+    featured = db.Column(db.Boolean, default=False)
     
     # Foreign Keys
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
@@ -124,10 +122,10 @@ class Order(db.Model, SerializerMixin):
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    status = db.Column(db.String(20), default='pending')  # pending, processing, shipped, delivered, cancelled
+    status = db.Column(db.String(20), default='pending')
     total_amount = db.Column(db.Float, nullable=False)
     shipping_address = db.Column(db.String(255))
-    items_json = db.Column(db.Text)  # Store order items as JSON string
+    items_json = db.Column(db.Text)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     
     # Relationships
@@ -138,15 +136,7 @@ class Order(db.Model, SerializerMixin):
     
     # Helper methods for JSON attributes
     def set_items(self, items_list):
-        """
-        Sets order items. Each item should be a dict with product_id, quantity, 
-        price_at_purchase, size, and color.
-        """
         self.items_json = json.dumps(items_list)
         
     def get_items(self):
-        """Returns a list of dictionaries representing order items."""
         return json.loads(self.items_json) if self.items_json else []
-
-
-

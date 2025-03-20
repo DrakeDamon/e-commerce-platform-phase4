@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
+import '../styles/components/ProductCard.css';
 const ProductCard = ({ product }) => {
   // Format price with 2 decimal places
   const formattedPrice = new Intl.NumberFormat('en-US', {

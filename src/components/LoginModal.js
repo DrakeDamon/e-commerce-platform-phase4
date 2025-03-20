@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { UserContext } from '../context/UserContext';
-
+import '../styles/components/LoginModal.css';
 // Validation schema
 const LoginSchema = Yup.object().shape({
   username: Yup.string()

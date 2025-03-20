@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
 from app import app
-from models import db, User, Product, Category, ProductCategory, Order
+from models import db, User, Product, Category, Subcategory, ProductCategory, Order
 import json
 
 def seed_database():
-    #ensures we are working ith flask app context
     with app.app_context():
         print("Starting seed...")
         
         # Clear existing data in reverse order to avoid foreign key constraint violations
         ProductCategory.query.delete()
         Product.query.delete()
+        Subcategory.query.delete()
         Category.query.delete()
         Order.query.delete()
         User.query.delete()
@@ -45,6 +45,18 @@ def seed_database():
         db.session.add_all([all_category, tops_category, bottoms_category])
         db.session.commit()
 
+        # Create subcategories
+        print("Creating subcategories...")
+        tshirts = Subcategory(name="T-Shirts", category_id=tops_category.id)
+        sweaters = Subcategory(name="Sweaters", category_id=tops_category.id)
+        jackets = Subcategory(name="Jackets", category_id=tops_category.id)
+        pants = Subcategory(name="Pants", category_id=bottoms_category.id)
+        shorts = Subcategory(name="Shorts", category_id=bottoms_category.id)
+        skirts = Subcategory(name="Skirts", category_id=bottoms_category.id)
+
+        db.session.add_all([tshirts, sweaters, jackets, pants, shorts, skirts])
+        db.session.commit()
+
         # Create products
         print("Creating products...")
         product1 = Product(
@@ -53,7 +65,8 @@ def seed_database():
             price=29.99,
             inventory_count=50,
             image_url="https://via.placeholder.com/300x400",
-            user_id=user1.id
+            user_id=user1.id,
+            subcategory_id=tshirts.id
         )
         product1.set_sizes(["S", "M", "L", "XL"])
         product1.set_colors(["White", "Black", "Navy", "Gray"])
@@ -64,18 +77,20 @@ def seed_database():
             price=49.99,
             inventory_count=35,
             image_url="https://via.placeholder.com/300x400",
-            user_id=user1.id
+            user_id=user1.id,
+            subcategory_id=pants.id
         )
         product2.set_sizes(["30", "32", "34", "36"])
         product2.set_colors(["Blue", "Black", "Gray"])
 
         product3 = Product(
-            name="Athletic workout shirt",
+            name="Athletic Workout Shirt",
             description="Lightweight button-down shirt made from 100% cotton. Great for casual or semi-formal occasions.",
             price=39.99,
             inventory_count=25,
             image_url="https://via.placeholder.com/300x400",
-            user_id=user1.id
+            user_id=user1.id,
+            subcategory_id=tshirts.id
         )
         product3.set_sizes(["S", "M", "L", "XL"])
         product3.set_colors(["White", "Blue", "Pink"])
@@ -84,7 +99,6 @@ def seed_database():
         db.session.commit()
 
         # Create product-category associations
-        #many to many relationship between products and categories
         print("Creating product-category associations...")
         pc1 = ProductCategory(product_id=product1.id, category_id=all_category.id, featured=True)
         pc2 = ProductCategory(product_id=product1.id, category_id=tops_category.id, featured=True)
