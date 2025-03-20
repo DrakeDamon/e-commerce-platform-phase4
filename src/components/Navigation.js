@@ -36,13 +36,9 @@ const Navigation = ({ onLoginClick, onRegisterClick }) => {
     setIsMenuOpen(false);
   };
 
-  const handleSearch = (e) => {
-    if (e.key === 'Enter') {
-      const term = e.target.value.trim();
-      setSearchTerm(term);
-      e.target.value = '';
-      setIsMenuOpen(false);
-    }
+  const handleSearchChange = (e) => {
+    const term = e.target.value.trim();
+    setSearchTerm(term); // Update search term as the user types
   };
 
   return (
@@ -107,7 +103,7 @@ const Navigation = ({ onLoginClick, onRegisterClick }) => {
             <input
               type="text"
               placeholder="Search products..."
-              onKeyPress={handleSearch}
+              onChange={handleSearchChange} // Update search term on every keystroke
             />
             <button className="search-button">
               <span role="img" aria-label="search">🔍</span>
