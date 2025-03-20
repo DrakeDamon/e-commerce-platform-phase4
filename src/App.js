@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import './styles/global.css'; // This exists in src/styles/
+import './styles/global.css';
 import Navigation from './components/Navigation';
 import Home from './pages/Home';
 import Cart from './pages/Cart';
 import UserProfile from './pages/UserProfile';
+import ProductDetail from './pages/ProductDetail'; // Add this
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
 import Footer from './components/Footer';
@@ -41,6 +42,7 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/profile" element={<UserProfile />} />
+                  <Route path="/products/:id" element={<ProductDetail />} /> {/* Add this */}
                 </Routes>
               </main>
               <Footer />
