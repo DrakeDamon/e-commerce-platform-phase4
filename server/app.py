@@ -1,9 +1,13 @@
 from flask import request, session, jsonify
 from flask_restful import Resource
+from flask_cors import CORS
 import json
 
 from config import app, db, api
 from models import User, Product, Category, Subcategory, ProductCategory, Order
+
+# Configure CORS to allow credentials and specify the origins
+CORS(app, supports_credentials=True, origins=["http://localhost:3000", "http://localhost:3003"])
 
 # Root route for testing
 @app.route('/')

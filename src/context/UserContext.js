@@ -1,6 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-// Manages user authentication and profile updates
-// Create the context
+
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
@@ -8,12 +7,11 @@ export const UserProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Check if user is already logged in when the app loads
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch('/me', {
-          credentials: 'include'  // Important for sending cookies
+        const response = await fetch('http://localhost:5555/me', {
+          credentials: 'include'
         });
         
         if (response.ok) {
@@ -33,10 +31,9 @@ export const UserProvider = ({ children }) => {
     checkSession();
   }, []);
 
-  // Login function
   const login = async (username, password) => {
     try {
-      const response = await fetch('/login', {
+      const response = await fetch('http://localhost:5555/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -58,10 +55,9 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  // Register function
   const register = async (userData) => {
     try {
-      const response = await fetch('/users', {
+      const response = await fetch('http://localhost:5555/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -83,10 +79,9 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  // Logout function
   const logout = async () => {
     try {
-      await fetch('/logout', {
+      await fetch('http://localhost:5555/logout', {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -98,12 +93,11 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  // Update user profile
   const updateProfile = async (updatedData) => {
     if (!user) return { success: false, error: 'Not logged in' };
     
     try {
-      const response = await fetch(`/users/${user.id}`, {
+      const response = await fetch(`http://localhost:5555/users/${user.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'

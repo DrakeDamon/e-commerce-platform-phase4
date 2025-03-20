@@ -5,7 +5,7 @@ import Navigation from './components/Navigation';
 import Home from './pages/Home';
 import Cart from './pages/Cart';
 import UserProfile from './pages/UserProfile';
-import ProductDetail from './pages/ProductDetail'; // Add this
+import ProductDetail from './pages/ProductDetail';
 import LoginModal from './components/LoginModal';
 import RegisterModal from './components/RegisterModal';
 import Footer from './components/Footer';
@@ -28,7 +28,7 @@ function App() {
   };
 
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <UserProvider>
         <CartProvider>
           <FilterProvider>
@@ -42,7 +42,7 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/profile" element={<UserProfile />} />
-                  <Route path="/products/:id" element={<ProductDetail />} /> {/* Add this */}
+                  <Route path="/products/:id" element={<ProductDetail />} />
                 </Routes>
               </main>
               <Footer />

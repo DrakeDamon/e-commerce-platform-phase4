@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
 import { CartContext } from '../context/CartContext';
 import { FilterContext } from '../context/FilterContext';
+import debounce from 'lodash/debounce';
 import '../styles/components/Navigation.css';
 
 const Navigation = ({ onLoginClick, onRegisterClick }) => {
@@ -26,19 +27,23 @@ const Navigation = ({ onLoginClick, onRegisterClick }) => {
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
     setSelectedSubcategory(null);
-    setSearchTerm(''); // Clear search term when changing category
+    setSearchTerm('');
     setIsMenuOpen(false);
   };
 
   const handleSubcategoryClick = (subcategory) => {
     setSelectedSubcategory(subcategory);
-    setSearchTerm(''); // Clear search term when changing subcategory
+    setSearchTerm('');
     setIsMenuOpen(false);
   };
 
+  const debouncedSearch = debounce((term) => {
+    setSearchTerm(term);
+  }, 300);
+
   const handleSearchChange = (e) => {
     const term = e.target.value.trim();
-    setSearchTerm(term); // Update search term as the user types
+    debouncedSearch(term);
   };
 
   return (
@@ -59,11 +64,7 @@ const Navigation = ({ onLoginClick, onRegisterClick }) => {
                 Home
               </Link>
             </li>
-            <li>
-              <Link to="/" onClick={() => handleCategoryClick('All')}>
-                All
-              </Link>
-            </li>
+            {/* Removed the duplicate "All" link */}
             {categories.map(category => (
               <li key={category.id} className={category.subcategories.length > 0 ? 'dropdown' : ''}>
                 {category.subcategories.length > 0 ? (
@@ -103,7 +104,7 @@ const Navigation = ({ onLoginClick, onRegisterClick }) => {
             <input
               type="text"
               placeholder="Search products..."
-              onChange={handleSearchChange} // Update search term on every keystroke
+              onChange={handleSearchChange}
             />
             <button className="search-button">
               <span role="img" aria-label="search">🔍</span>
