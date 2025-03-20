@@ -1,22 +1,25 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { FilterContext } from '../context/FilterContext'; // Correct path
-import '../styles/pages/Home.css'; // Correct path
+import { FilterContext } from '../context/FilterContext';
+import '../styles/pages/Home.css';
 
 function Home() {
   const [products, setProducts] = useState([]);
-  const { selectedCategory, selectedSubcategory } = useContext(FilterContext);
+  const { selectedCategory, selectedSubcategory, searchTerm } = useContext(FilterContext);
 
   useEffect(() => {
     let url = `http://localhost:5555/products?category=${selectedCategory}`;
     if (selectedSubcategory) {
       url += `&subcategory=${selectedSubcategory}`;
     }
+    if (searchTerm) {
+      url += `&search=${searchTerm}`;
+    }
 
     fetch(url)
       .then(response => response.json())
       .then(data => setProducts(data))
       .catch(error => console.error('Error fetching products:', error));
-  }, [selectedCategory, selectedSubcategory]);
+  }, [selectedCategory, selectedSubcategory, searchTerm]);
 
   return (
     <div className="home-page">
@@ -29,7 +32,7 @@ function Home() {
       <div className="content-container">
         <div className="products-container">
           <div className="search-results-header">
-            <h2>All Products</h2>
+            <h2>{searchTerm ? `Search Results for "${searchTerm}"` : 'All Products'}</h2>
           </div>
           {products.length === 0 ? (
             <div className="loading-spinner">Loading...</div>
