@@ -1,64 +1,84 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext, useEffect } from "react";
 
-export const FilterContext = createContext();
+const FilterContext = React.createContext();
 
 export const FilterProvider = ({ children }) => {
+  const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedSubcategory, setSelectedSubcategory] = useState(null);
-  const [searchTerm, setSearchTerm] = useState(''); // Add searchTerm state
-  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Fetch categories and subcategories from the backend
-  useEffect(() => {
-    const fetchCategories = async () => {
+  const fetchWithRetry = async (url, retries = 3, delay = 2000) => {
+    for (let i = 0; i < retries; i++) {
       try {
-        const response = await fetch('http://localhost:5555/categories');
-        if (response.ok) {
-          const data = await response.json();
-          setCategories(data);
+        console.log(`Fetching ${url} (Attempt ${i + 1}/${retries})`);
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
         }
-      } catch (error) {
-        console.error('Error fetching categories:', error);
+        return await response.json();
+      } catch (err) {
+        console.error(`Fetch attempt ${i + 1} failed:`, err);
+        if (i === retries - 1) throw err;
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
-    };
+    }
+  };
 
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchWithRetry("http://localhost:5555/products");
+      setProducts(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setError(error.message || "Unable to fetch products. Please try again later.");
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const data = await fetchWithRetry("http://localhost:5555/categories");
+      setCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      setError(error.message || "Unable to fetch categories.");
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
     fetchCategories();
   }, []);
-
-  // Update the URL when the selected category, subcategory, or search term changes
-  useEffect(() => {
-    let url = '/';
-    const params = new URLSearchParams();
-    if (selectedCategory !== 'All') {
-      params.set('category', selectedCategory);
-    }
-    if (selectedSubcategory) {
-      params.set('subcategory', selectedSubcategory);
-    }
-    if (searchTerm) {
-      params.set('search', searchTerm);
-    }
-    if (params.toString()) {
-      url = `/?${params.toString()}`;
-    }
-    navigate(url, { replace: true });
-  }, [selectedCategory, selectedSubcategory, searchTerm, navigate]);
 
   return (
     <FilterContext.Provider
       value={{
+        products,
         categories,
         selectedCategory,
         setSelectedCategory,
         selectedSubcategory,
         setSelectedSubcategory,
         searchTerm,
-        setSearchTerm, // Provide setSearchTerm to update the search term
+        setSearchTerm,
+        fetchProducts,
+        loading,
+        error,
       }}
     >
       {children}
     </FilterContext.Provider>
   );
 };
+
+export const useFilterContext = () => {
+  return useContext(FilterContext);
+};
+
+export { FilterContext };

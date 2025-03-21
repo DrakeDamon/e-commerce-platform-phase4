@@ -26,13 +26,14 @@ const Navigation = ({ onLoginClick, onRegisterClick }) => {
 
   const handleCategoryClick = (category) => {
     setSelectedCategory(category);
-    setSelectedSubcategory(null);
+    setSelectedSubcategory(null); // Reset subcategory to show all products in the category
     setSearchTerm('');
     setIsMenuOpen(false);
   };
 
-  const handleSubcategoryClick = (subcategory) => {
-    setSelectedSubcategory(subcategory);
+  const handleSubcategoryClick = (category, subcategory) => {
+    setSelectedCategory(category); // Set the main category
+    setSelectedSubcategory(subcategory); // Set the subcategory
     setSearchTerm('');
     setIsMenuOpen(false);
   };
@@ -64,21 +65,22 @@ const Navigation = ({ onLoginClick, onRegisterClick }) => {
                 Home
               </Link>
             </li>
-            {/* Removed the duplicate "All" link */}
             {categories.map(category => (
               <li key={category.id} className={category.subcategories.length > 0 ? 'dropdown' : ''}>
                 {category.subcategories.length > 0 ? (
                   <>
-                    <button className="dropdown-toggle">{category.name}</button>
+                    <button
+                      className="dropdown-toggle"
+                      onClick={() => handleCategoryClick(category.name)} // Add onClick to set the main category
+                    >
+                      {category.name}
+                    </button>
                     <ul className="dropdown-menu">
                       {category.subcategories.map(subcategory => (
                         <li key={subcategory.id}>
                           <Link
                             to="/"
-                            onClick={() => {
-                              setSelectedCategory(category.name);
-                              handleSubcategoryClick(subcategory.name);
-                            }}
+                            onClick={() => handleSubcategoryClick(category.name, subcategory.name)}
                           >
                             {subcategory.name}
                           </Link>

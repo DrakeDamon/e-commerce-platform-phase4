@@ -1,0 +1,53 @@
+.user-profile {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.user-profile h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.profile-details {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.profile-details p {
+  margin: 10px 0;
+}
+
+.user-profile h2 {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+}
+
+.order-list {
+  list-style: none;
+  padding: 0;
+}
+
+.order-list li {
+  background-color: #f0f0f0;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.order-list li p {
+  margin: 5px 0;
+}
+
+.order-list li ul {
+  list-style: none;
+  padding-left: 20px;
+}
+
+.order-list li ul li {
+  background-color: transparent;
+  padding: 5px 0;
+  margin: 0;
+}

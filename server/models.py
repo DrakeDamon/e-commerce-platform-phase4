@@ -92,7 +92,9 @@ class Product(db.Model, SerializerMixin):
             'available_sizes': self.get_sizes(),
             'available_colors': self.get_colors(),
             'user_id': self.user_id,
-            'subcategory_id': self.subcategory_id
+            'subcategory_id': self.subcategory_id,
+            'category': [pc.category.name for pc in self.product_categories],  # Add category names
+            'subcategory': self.subcategory.name if self.subcategory else None,  # Add subcategory name
         }
 
 class Category(db.Model, SerializerMixin):

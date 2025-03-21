@@ -1,13 +1,13 @@
-import React, { createContext, useState, useContext } from 'react';
-import { UserContext } from './UserContext';
+import React, { useState, useEffect, useContext } from 'react';
+import { useUserContext } from './UserContext';
 
-export const CartContext = createContext();
+export const CartContext = React.createContext();
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
-  const { user } = useContext(UserContext);
+  const { user } = useUserContext();
 
-  const addToCart = (product, quantity = 1, size, color) => {
+  const addToCart = (product, quantity, size, color) => {
     setCartItems((prevItems) => {
       const existingItem = prevItems.find(
         (item) => item.product.id === product.id && item.size === size && item.color === color
@@ -31,58 +31,64 @@ export const CartProvider = ({ children }) => {
     );
   };
 
-  const checkout = async () => {
+  const placeOrder = async () => {
     if (!user) {
-      return { success: false, error: 'Please log in to checkout' };
+      throw new Error('You must be logged in to place an order');
     }
     if (cartItems.length === 0) {
-      return { success: false, error: 'Cart is empty' };
+      throw new Error('Cart is empty');
     }
 
-    try {
-      const orderItems = cartItems.map((item) => ({
+    const orderData = {
+      user_id: user.id,
+      items: cartItems.map(item => ({
         product_id: item.product.id,
         quantity: item.quantity,
-        price_at_purchase: item.product.price,
         size: item.size,
         color: item.color,
-      }));
+      })),
+      total: cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0),
+    };
 
-      const totalAmount = cartItems.reduce(
-        (total, item) => total + item.product.price * item.quantity,
-        0
-      );
-
+    try {
       const response = await fetch('http://localhost:5555/orders', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          total_amount: totalAmount,
-          shipping_address: user.address,
-          items: orderItems,
-        }),
-        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData),
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Checkout failed');
+        throw new Error('Failed to place order');
       }
 
-      setCartItems([]); // Clear cart on successful checkout
-      return { success: true };
-    } catch (err) {
-      return { success: false, error: err.message };
+      const order = await response.json();
+      setCartItems([]); // Clear cart after successful order
+      return order;
+    } catch (error) {
+      console.error('Error placing order:', error);
+      throw error;
     }
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
   };
 
   const itemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
+  useEffect(() => {
+    if (!user) {
+      clearCart();
+    }
+  }, [user]);
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, checkout, itemCount }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, placeOrder, clearCart, itemCount }}>
       {children}
     </CartContext.Provider>
   );
+};
+
+export const useCartContext = () => {
+  return useContext(CartContext);
 };
