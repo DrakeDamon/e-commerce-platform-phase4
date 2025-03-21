@@ -1,53 +1,313 @@
+/* src/styles/pages/UserProfile.css */
 .user-profile {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 .user-profile h1 {
-  font-size: 2em;
-  margin-bottom: 20px;
-}
-
-.profile-details {
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 5px;
-  margin-bottom: 20px;
-}
-
-.profile-details p {
-  margin: 10px 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: #111;
 }
 
 .user-profile h2 {
-  font-size: 1.5em;
-  margin-bottom: 20px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 30px 0 20px;
+  color: #111;
+  position: relative;
 }
 
+.user-profile h2::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  background-color: #111;
+}
+
+.profile-details {
+  background-color: white;
+  padding: 25px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.profile-details p {
+  margin: 12px 0;
+  font-size: 1rem;
+  color: #555;
+  display: flex;
+  align-items: center;
+}
+
+.profile-details p strong {
+  min-width: 100px;
+  color: #111;
+  font-weight: 600;
+}
+
+.profile-form {
+  background-color: white;
+  padding: 25px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: a20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #111;
+}
+
+.form-control,
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.success {
+  color: #2e7d32;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.form-actions button {
+  padding: a12px 24px;
+  background-color: #111;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.form-actions button:hover {
+  background-color: #333;
+}
+
+.form-actions button:disabled {
+  background-color: #bdbdbd;
+  cursor: not-allowed;
+}
+
+/* Order history section */
 .order-list {
   list-style: none;
   padding: 0;
 }
 
 .order-list li {
-  background-color: #f0f0f0;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 5px;
+  background-color: white;
+  padding: 25px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.order-list li p {
-  margin: 5px 0;
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
 }
 
-.order-list li ul {
+.order-id {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.order-status {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-pending {
+  background-color: #fff8e1;
+  color: #ff8f00;
+}
+
+.status-processing {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.status-shipped {
+  background-color: #e0f2f1;
+  color: #00796b;
+}
+
+.status-delivered {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-cancelled {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.order-total {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 15px;
+}
+
+.order-date {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.order-items {
+  margin-top: 20px;
+}
+
+.order-items h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #111;
+}
+
+.order-items ul {
   list-style: none;
-  padding-left: 20px;
+  padding: 0;
+  margin: 0;
 }
 
-.order-list li ul li {
-  background-color: transparent;
-  padding: 5px 0;
-  margin: 0;
+.order-items ul li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  margin-bottom: 8px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  box-shadow: none;
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-name {
+  font-weight: 500;
+  color: #111;
+  margin-bottom: 5px;
+}
+
+.item-specs {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.item-price {
+  font-weight: 600;
+  color: #111;
+}
+
+.no-orders {
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  color: #666;
+}
+
+.loading-orders {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .user-profile h1 {
+    font-size: 1.8rem;
+  }
+
+  .user-profile h2 {
+    font-size: 1.3rem;
+  }
+
+  .profile-details p {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-details p strong {
+    margin-bottom: 5px;
+  }
+
+  .order-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .order-status {
+    margin-top: 10px;
+  }
+
+  .order-items ul li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .item-price {
+    margin-top: 10px;
+    align-self: flex-end;
+  }
 }
