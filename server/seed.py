@@ -1,10 +1,10 @@
 from app import app, db
-from models import User, Category, Subcategory, Product, Order
+from models import User, Category, Subcategory, Product, ProductCategory, Order
 
 def seed_data():
     with app.app_context():
         # Clear existing data in reverse order to avoid foreign key constraint violations
-        Category.query.delete()
+        ProductCategory.query.delete()
         Product.query.delete()
         Subcategory.query.delete()
         Category.query.delete()
@@ -49,14 +49,13 @@ def seed_data():
             category = Category(name=cat_data["name"])
             db.session.add(category)
             db.session.flush()
+            categories.append(category)
 
             for sub_name in cat_data["subcategories"]:
                 subcategory = Subcategory(name=sub_name, category_id=category.id)
                 db.session.add(subcategory)
                 db.session.flush()
                 subcategories_dict[sub_name] = subcategory.id
-
-            categories.append(category)
 
         # Seed Products (8 sportswear-related products)
         products = [
@@ -111,7 +110,7 @@ def seed_data():
                 price=19.99,
                 image_url="https://example.com/images/ski-mask.jpg",
                 user_id=admin.id,
-                subcategory_id=subcategories_dict["Jackets"],
+                subcategory_id=None,  # No subcategory
                 inventory_count=60
             ),
             Product(
@@ -120,7 +119,7 @@ def seed_data():
                 price=34.99,
                 image_url="https://example.com/images/football-gloves.jpg",
                 user_id=admin.id,
-                subcategory_id=subcategories_dict["Shirts"],
+                subcategory_id=None,  # No subcategory
                 inventory_count=20
             ),
             Product(
@@ -129,7 +128,7 @@ def seed_data():
                 price=89.99,
                 image_url="https://example.com/images/football-cleats.jpg",
                 user_id=admin.id,
-                subcategory_id=subcategories_dict["Shorts"],
+                subcategory_id=None,  # No subcategory
                 inventory_count=15
             )
         ]
@@ -161,6 +160,20 @@ def seed_data():
                 product.set_colors(["White", "Black"])
             db.session.add(product)
         db.session.flush()
+
+        # Seed ProductCategory associations
+        product_categories = [
+            # Tops category (category_id=1)
+            ProductCategory(product_id=products[0].id, category_id=categories[0].id, featured=False),  # Classic White T-Shirt -> Tops
+            ProductCategory(product_id=products[1].id, category_id=categories[0].id, featured=False),  # Athletic Workout Shirt -> Tops
+            ProductCategory(product_id=products[2].id, category_id=categories[0].id, featured=False),  # Long Sleeve Dry Fit Shirt -> Tops
+            ProductCategory(product_id=products[4].id, category_id=categories[0].id, featured=False),  # Sweatshirt -> Tops
+            # Bottoms category (category_id=2)
+            ProductCategory(product_id=products[3].id, category_id=categories[1].id, featured=False),  # Joggers -> Bottoms
+            # Ski Mask, Football Gloves, and Football Cleats are not associated with any category
+        ]
+        for pc in product_categories:
+            db.session.add(pc)
 
         # Seed Sample Orders for Customers
         orders = [
