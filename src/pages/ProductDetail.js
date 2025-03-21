@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { CartContext } from '../context/CartContext';
+import { useCartContext } from '../context/CartContext';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -9,7 +9,7 @@ const ProductDetail = () => {
   const [error, setError] = useState(null);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
-  const { addToCart } = useContext(CartContext);
+  const { addToCart } = useCartContext();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -19,6 +19,7 @@ const ProductDetail = () => {
           throw new Error('Product not found');
         }
         const data = await response.json();
+        console.log("Fetched product data:", data); // Debug log
         setProduct(data);
       } catch (err) {
         setError(err.message);
@@ -43,13 +44,59 @@ const ProductDetail = () => {
   if (error) return <div>Error: {error}</div>;
   if (!product) return <div>Product not found</div>;
 
-  const sizes = product.available_sizes ? JSON.parse(product.available_sizes) : [];
-  const colors = product.available_colors ? JSON.parse(product.available_colors) : [];
+  console.log("Product sizes:", product.available_sizes); // Debug log
+  console.log("Product colors:", product.available_colors); // Debug log
+
+  // Handle different formats or missing data for sizes
+  let sizes = [];
+  if (product.available_sizes) {
+    if (typeof product.available_sizes === 'string') {
+      try {
+        // Try to parse as JSON
+        sizes = JSON.parse(product.available_sizes);
+      } catch (e) {
+        // If parsing fails, treat as comma-separated string
+        sizes = product.available_sizes.split(',').map(size => size.trim());
+      }
+    } else if (Array.isArray(product.available_sizes)) {
+      // It's already an array
+      sizes = product.available_sizes;
+    }
+  }
+
+  // Handle different formats or missing data for colors
+  let colors = [];
+  if (product.available_colors) {
+    if (typeof product.available_colors === 'string') {
+      try {
+        // Try to parse as JSON
+        colors = JSON.parse(product.available_colors);
+      } catch (e) {
+        // If parsing fails, treat as comma-separated string
+        colors = product.available_colors.split(',').map(color => color.trim());
+      }
+    } else if (Array.isArray(product.available_colors)) {
+      // It's already an array
+      colors = product.available_colors;
+    }
+  }
+
+  // Fallback defaults if we still don't have sizes or colors
+  if (!sizes.length) sizes = ['S', 'M', 'L', 'XL'];
+  if (!colors.length) colors = ['Black', 'White', 'Blue'];
 
   return (
     <div className="product-detail">
       <h1>{product.name}</h1>
-      <img src={product.image_url} alt={product.name} style={{ maxWidth: '300px' }} />
+      <img 
+        src={product.image_url || 'https://placehold.co/400/e2e8f0/1e293b?text=Product'} 
+        alt={product.name} 
+        style={{ maxWidth: '300px' }}
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src = 'https://placehold.co/400/e2e8f0/1e293b?text=Product';
+        }}
+      />
       <p>{product.description}</p>
       <p>Price: ${product.price}</p>
       <p>Inventory: {product.inventory_count}</p>

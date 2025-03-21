@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/components/ProductCard.css';
+
 const ProductCard = ({ product }) => {
   // Format price with 2 decimal places
   const formattedPrice = new Intl.NumberFormat('en-US', {
@@ -8,16 +9,19 @@ const ProductCard = ({ product }) => {
     currency: 'USD'
   }).format(product.price);
   
+  // Use a reliable placeholder service with smaller dimensions
+  const placeholderUrl = `https://placehold.co/200x250/e2e8f0/1e293b?text=${encodeURIComponent(product.name || 'Product')}`;
+  
   return (
     <div className="product-card">
       <Link to={`/products/${product.id}`} className="product-link">
         <div className="product-image">
           <img 
-            src={product.image_url || '/placeholder-image.jpg'} 
+            src={product.image_url || placeholderUrl} 
             alt={product.name}
             onError={(e) => {
               e.target.onerror = null;
-              e.target.src = '/placeholder-image.jpg';
+              e.target.src = placeholderUrl;
             }}
           />
         </div>
@@ -37,12 +41,7 @@ const ProductCard = ({ product }) => {
           )}
         </div>
       </Link>
-      
-      <div className="product-actions">
-        <Link to={`/products/${product.id}`} className="view-details-btn">
-          View Details
-        </Link>
-      </div>
+    
     </div>
   );
 };
