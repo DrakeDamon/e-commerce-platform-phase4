@@ -33,26 +33,6 @@ const Home = () => {
             <div key={product.id} className="product-card">
               <h3>{product.name}</h3>
               <p>Price: ${product.price.toFixed(2)}</p>
-              <div>
-                <label>Size:</label>
-                <select defaultValue={product.available_sizes[0]}>
-                  {product.available_sizes.map(size => (
-                    <option key={size} value={size}>{size}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label>Color:</label>
-                <select defaultValue={product.available_colors[0]}>
-                  {product.available_colors.map(color => (
-                    <option key={color} value={color}>{color}</option>
-                  ))}
-                </select>
-              </div>
-              <input type="number" defaultValue={1} min={1} max={product.inventory_count} />
-              <button onClick={() => addToCart(product, 1, product.available_sizes[0], product.available_colors[0])}>
-                Add to Cart
-              </button>
             </div>
           ))
         )}
